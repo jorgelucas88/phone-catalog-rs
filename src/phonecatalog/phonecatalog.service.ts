@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { fstat } from 'fs';
 import { Repository } from 'typeorm';
 import { Phone } from './entities/phone.entity';
-
+const fs = require('fs')
 
 @Injectable()
 export class PhoneCatalogService {
@@ -33,10 +34,15 @@ export class PhoneCatalogService {
         .select() // *
         .where("deletedAt is null")
         .getMany();
-
+  
+    phones.forEach(p => {
+      p = p.imageFilename ? p["image"] = fs.readFileSync(`./phoneImages/${p.imageFilename}`, { encoding: 'base64'}) : ""
+    });
     return { total: phoneCount.length, phones: phones };
 
   }
+
+  public async 
 
   public async deletePhone(phoneId: number) {
     return await this.phoneRepository
@@ -49,13 +55,32 @@ export class PhoneCatalogService {
       .execute()
       ;
   }
-
+  
   public async updatePhone(phone: Phone) {
+    phone.updatedAt = new Date();
+    console.log(phone, "updatePhone");
     return await this.phoneRepository
       .createQueryBuilder()
       .update(Phone)
       .set(phone)
       .where("id = :id", { id: phone.id })
       .execute();
+  }
+
+  public async deletePhoneImage(phoneId: number) {
+    const phone: Phone = await this.phoneRepository.findOne(phoneId);
+    await fs.unlink(`./phoneImages/${phone.imageFilename}`, (r) => { console.log(r) });
+
+    return await this.phoneRepository
+      .createQueryBuilder()
+      .update(Phone)
+      .set({
+        updatedAt: new Date(),
+        imageOriginalFileName: null,
+        imageFilename: null
+      })
+      .where("id = :id", { id: phoneId })
+      .execute()
+      ;
   }
 }

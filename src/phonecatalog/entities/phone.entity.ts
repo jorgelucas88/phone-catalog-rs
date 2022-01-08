@@ -25,7 +25,10 @@ export class Phone {
     price: number;
     
     @Column({nullable: true})
-    image?: Buffer;
+    imageOriginalFileName?: string;
+
+    @Column({nullable: true})
+    imageFilename?: string;
 
     @Column({nullable: true})
     screen: string;
