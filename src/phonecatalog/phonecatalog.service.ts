@@ -17,22 +17,40 @@ export class PhoneCatalogService {
     return await this.phoneRepository.save(phone);
   }
 
-  public async getPhones(page: number, pageSize: number): Promise<{ total: number, phones: Phone[] }> {
-    
-    const phones: Phone[] = 
+  public async getPhones(page: number, pageSize: number, searchTerm?: string): Promise<{ total: number, phones: Phone[] }> {
+    searchTerm = searchTerm?.trim() || "";
+    const phones: Phone[] = // actual data
       await this.phoneRepository
         .createQueryBuilder("Phone")
         .select() // *
-        .where("deletedAt is null")
+        .where("(deletedAt is null) and (name like :name or manufacturer like :manufacturer or description like :description or color like :color or price like :price or screen like :screen or processor like :processor or ram like :ram)", {
+          name: `%${searchTerm}%`,
+          manufacturer:`%${searchTerm}%`,
+          description:`%${searchTerm}%`,
+          color:`%${searchTerm}%`,
+          price:`%${searchTerm}%`,
+          screen:`%${searchTerm}%`,
+          processor:`%${searchTerm}%`,
+          ram: `%${searchTerm}%`,
+        })
         .orderBy("id", "DESC")
         .take(pageSize)
         .skip(page * pageSize)
         .getMany();
-    const phoneCount: Phone[] = 
+    const phoneCount: Phone[] = // count for pagination purposes in frontend
       await this.phoneRepository
         .createQueryBuilder("Phone")
         .select() // *
-        .where("deletedAt is null")
+        .where("(deletedAt is null) and (name like :name or manufacturer like :manufacturer or description like :description or color like :color or price like :price or screen like :screen or processor like :processor or ram like :ram)", {
+          name: `%${searchTerm}%`,
+          manufacturer:`%${searchTerm}%`,
+          description:`%${searchTerm}%`,
+          color:`%${searchTerm}%`,
+          price:`%${searchTerm}%`,
+          screen:`%${searchTerm}%`,
+          processor:`%${searchTerm}%`,
+          ram: `%${searchTerm}%`,
+        })
         .getMany();
   
     phones.forEach(p => {

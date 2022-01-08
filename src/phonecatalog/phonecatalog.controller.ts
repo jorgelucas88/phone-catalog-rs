@@ -11,7 +11,8 @@ export class PhoneCatalogController {
   async getPhones(@Req() req) {
     const page: number = req.query.page || 0;
     const pageSize: number = req.query.pageSize || 15;
-    return await this.phoneCatalogService.getPhones(page, pageSize);
+    const searchTerm: string = req.query.searchTerm || null;
+    return await this.phoneCatalogService.getPhones(page, pageSize, searchTerm);
   }
 
   @Post()
