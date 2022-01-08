@@ -2,8 +2,8 @@ version: '3.8'
 
 services:
     dev:
-        container_name: nestjs_api_dev
-        image: nestjs-api-dev:1.0.0
+        container_name: phone_catalog_api_dev
+        image: phone-catalog-apidev:1.0.0
         build:
             context: .
             target: development
@@ -19,8 +19,8 @@ services:
             - /usr/src/app/node_modules
         restart: unless-stopped
     prod:
-        container_name: nestjs_api_prod
-        image: nestjs-api-prod:1.0.0
+        container_name: phone_catalog_api_prod
+        image: phone-catalog-apiprod:1.0.0
         build:
             context: .
             target: production
